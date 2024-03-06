@@ -1,4 +1,4 @@
-from app import db
+from app.extensions import db
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -10,7 +10,6 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
-from app import db
 
 class Avaliacao(db.Model):
     __tablename__ = 'Avaliacao'

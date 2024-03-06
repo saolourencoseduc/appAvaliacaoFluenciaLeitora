@@ -1,15 +1,14 @@
 # app/__init__.py
 
 from flask import Flask, jsonify, current_app
-from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from app.api.routes import bp as api_bp
-
-db = SQLAlchemy()  # Initialize the SQLAlchemy class
+from app.extensions import db
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
     db.init_app(app)  # Bind SQLAlchemy to the Flask app
 
     # Set up logging
@@ -32,10 +31,8 @@ def create_app(config_class=Config):
         return response
 
     # Import models here to ensure they are known to SQLAlchemy
-    from app.models import models
-
-    # Create the database tables if they don't already exist
     with app.app_context():
+        from app.models import models
         db.create_all()
 
     return app

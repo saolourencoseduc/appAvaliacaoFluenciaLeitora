@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from flask import current_app, jsonify, request
 import speech_recognition as sr
 from ..utils import database, helpers
+from app.extensions import db
 
 def process_audio_and_transcribe(request):
     if 'audio_file' not in request.files:

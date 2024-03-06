@@ -1,7 +1,7 @@
 # database.py
 
 from flask import current_app, jsonify
-from app import db
+from app.extensions import db
 from app.models.models import Avaliacao  # Make sure to have an Avaliacao model defined in your models.py
 
 def insert_transcription_into_db(transcript, accuracy, word_count, wpm, duration, fluency_level, crdi, id_avaliacao):

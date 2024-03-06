@@ -1,6 +1,6 @@
 # app/api/routes.py
 from flask import Blueprint, request, jsonify
-
+from app.extensions import db
 from app.models.models import User
 from ..services.transcription_service import process_audio_and_transcribe
 
