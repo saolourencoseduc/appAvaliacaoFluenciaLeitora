@@ -1,9 +1,10 @@
+# Assuming this is part of a Flask view or service file
+
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app, jsonify, request
 import speech_recognition as sr
 from ..utils import database, helpers
-from app.extensions import db
 
 def process_audio_and_transcribe(request):
     if 'audio_file' not in request.files:
@@ -38,12 +39,11 @@ def process_audio_and_transcribe(request):
     
     crdi = helpers.calculate_crdi(transcript, reference_text, duration)
 
-    success = database.insert_transcription_into_db(transcript, accuracy, word_count, wpm, duration, fluency_level, crdi, id_avaliacao)
+    # Handle the success or failure of data insertion
+    if not database.insert_transcription_into_db(transcript, accuracy, word_count, wpm, duration, fluency_level, crdi, id_avaliacao):
+        return jsonify({"error": "Failed to insert data into database"}), 500
 
     os.remove(file_path)
-
-    if not success:
-        return jsonify({"error": "Failed to insert data into database"}), 500
 
     return jsonify({
         "transcription": transcript,
