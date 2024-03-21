@@ -1,28 +1,34 @@
-# app/__init__.py
-
+import logging
 from flask import Flask, jsonify, current_app
+from flask_login import LoginManager
 from config import Config
-from app.api.routes import bp as api_bp
 from app.extensions import db
+from app.api.routes import bp as api_bp
+from app.models.models import User
+
+# Cria uma instância do LoginManager
+login_manager = LoginManager()
+# Define a view de login para redirecionar usuários não autenticados.
+login_manager.login_view = 'api.login'
 
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    db.init_app(app)  # Bind SQLAlchemy to the Flask app
+    # Definindo a SECRET_KEY
+    app.config['SECRET_KEY'] = 'testefap123'
 
-    # Set up logging
+    db.init_app(app)
+
     if not app.debug:
-        import logging
-        from logging import StreamHandler
-        handler = StreamHandler()
+        # Aqui está a linha corrigida
+        handler = logging.StreamHandler()
         handler.setLevel(logging.INFO)
         app.logger.addHandler(handler)
 
-    # Register blueprints
+    # Registra o blueprint da API
     app.register_blueprint(api_bp, url_prefix='/api')
 
-    # Custom error handler
     @app.errorhandler(Exception)
     def handle_exception(e):
         current_app.logger.error(f"Unhandled exception: {e}")
@@ -30,9 +36,13 @@ def create_app(config_class=Config):
         response.status_code = 500
         return response
 
-    # Import models here to ensure they are known to SQLAlchemy
     with app.app_context():
-        from app.models import models
         db.create_all()
+
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
 
     return app
